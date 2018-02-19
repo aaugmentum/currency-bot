@@ -24,18 +24,23 @@ bot.on('new_chat_members', async (ctx) => {
 bot.hears(CONSTS.MAIN_RE, async (ctx) => {
     let m = ctx.message.text;
     let arr = m.match(CONSTS.MAIN_RE), i=0, reply='';
-    const rate = await db.getItem(CONSTS.RATE_KEY);
-    console.log(rate);
+    const inf = await db.getItems(CONSTS.KEYS);
+
     for(;i<arr.length; i++) {
-        reply += 'The ';
+        reply += 'The *';
         let aed = arr[i].match(CONSTS.NUM_RE)[0];
         console.log(aed);
-        reply += aed + 'AED is ';
-        let usd = aed*rate;
-        reply += usd.toFixed(2) + 'USD\n';
+        reply += aed + 'AED* is *';
+        let usd = aed*inf.rate;
+        reply += usd.toFixed(2) + 'USD*\n';
     }
+    let last = new Date();
+    last.setTime(inf.date);
+    console.log(last);
+    reply += '\`Last update: ';
+    reply += last + '\`';
     console.log(reply);
-    ctx.reply(reply); 
+    ctx.replyWithMarkdown(reply); 
 })
 
 
@@ -51,15 +56,15 @@ app.listen(PORT, ()=> {
 //CRON
 const cron = require('node-cron');
 
-cron.schedule('30 1 * * *', () => update(), true);
+cron.schedule('10 * * * *', () => update(), true);
 
 async function update() {
     const rates = await request.get(CONSTS.RATE_URL);
     const forSave = {
         rate: 1/rates.rates.AED,
-        date: rates.timestamp
+        date: Date.now()
     }
-
+    console.log(forSave.date);
     await db.saveItems(forSave);
     console.log(`Saved: ${forSave}`);
 }
