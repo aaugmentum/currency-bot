@@ -5,11 +5,9 @@ const PATH = './utils/localstorage/db.json';
 const writeToDisk = async (str) => {
     fs.writeFile(PATH, str, 'utf8', (err) => {
         if(err) throw err;
-        console.log('Saved!');
+        //console.log('Saved!');
     });
 }
-
-
 
 const readFromDisk = async () => {
     return new Promise((resolve, reject) => {

@@ -1,9 +1,17 @@
 const db = require('./utils/localstorage/db.js');
 
 async function test() {
-    await db.saveItems({'rate': 0.27, 'date': '18-02-2018'});
-    let obj = await db.getItems(['rate', 'date']);
-    console.log(obj);
+    const req = require('./utils/network/request.js');
+    const result = await req.get('https://openexchangerates.org/api/latest.json?app_id=6f2d5004deb942168f5aa5d3941925ef');
+    console.log(result);
+    console.log(new Date());
 }
 
 test();
+
+const cron = require('node-cron');
+
+let task = cron.schedule('0 33 19 * * *', () => console.log('Hi'), true);
+
+console.log('HERE');
+

@@ -1,6 +1,7 @@
 //Consts
 const CONSTS = require('./utils/consts.js');
 const db = require('./utils/localstorage/db.js');
+const request = require('./utils/network/request.js');
 //Telegraf
 const Telegraf = require('telegraf');
 const bot = new Telegraf(CONSTS.BOT_API);
@@ -46,3 +47,19 @@ const PORT = process.env.port || 3001;
 app.listen(PORT, ()=> {
     console.log(`We are on ${PORT}`);
 });
+
+//CRON
+const cron = require('node-cron');
+
+cron.schedule('30 1 * * *', () => update(), true);
+
+async function update() {
+    const rates = await request.get(CONSTS.RATE_URL);
+    const forSave = {
+        rate: 1/rates.rates.AED,
+        date: rates.timestamp
+    }
+
+    await db.saveItems(forSave);
+    console.log(`Saved: ${forSave}`);
+}
